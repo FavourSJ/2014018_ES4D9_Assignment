@@ -16,9 +16,35 @@ epsilon_c = 0.89;   % Emissivity of the tube
 g = 9.81;           % Acceleration due to gravity (m/s^2)
 sigma = 5.67e-8;    % Stefan-Boltzmann constant (W/m^2·K^4)
 
-% Initial Temperature Assumptions
-Ts = 50;    % Initial surface temperature (°C) 50
-Tc = 30;    % Initial tube temperature (°C) 30
+% Loop over all combinations of Ts and Tc
+for i = 1:length(Ts_range)
+    for j = 1:length(Tc_range)
+        % Set initial temperature guesses
+        Ts = Ts_range(i);  % Initial surface temperature (°C)
+        Tc = Tc_range(j);  % Initial tube temperature (°C)
+        
+        fprintf('\nTesting Ts = %.1f°C, Tc = %.1f°C\n', Ts, Tc);
+        
+        % Run the existing calculations
+        T_out_result = calculate_T_out(T_out, Ts, Tc, Ta, m_dot, Cp, T_in, G, A_s, alpha_s, V, L_c, air_properties, epsilon_c, sigma, error_boundary, L_s, beta_deg, g, epsilon_s);
+        Ts_result = inner(Tc, Ts, T_out_result, air_properties, L_s, beta_deg, g, epsilon_s, epsilon_c, sigma, V, L_c, Ta, m_dot, Cp, T_in, h_i, A_i, error_boundary);
+        Tc_result = outer(Tc, Ts_result, air_properties, L_s, beta_deg, g, epsilon_s, epsilon_c, sigma, V, L_c, Ta, A_s, error_boundary);
+        
+        % Store results
+        T_out_results(i, j) = T_out_result;
+        Ts_results(i, j) = Ts_result;
+        Tc_results(i, j) = Tc_result;
+        
+        % Display final results for this combination
+        fprintf('Final Results: T_out = %.6f°C, Ts = %.6f°C, Tc = %.6f°C\n', T_out_result, Ts_result, Tc_result);
+    end
+end    % Initial tube temperature (°C) 30
+
+% Optionally, display all results in a table
+disp('Summary of Results:');
+results_table = table(Ts_range', Ts_results, Tc_results, T_out_results, ...
+    'VariableNames', {'Initial_Ts', 'Final_Ts', 'Final_Tc', 'Final_T_out'});
+disp(results_table);
 
 error_boundary = 0.000000000001;
 
