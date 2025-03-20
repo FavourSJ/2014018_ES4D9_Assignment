@@ -191,3 +191,34 @@ fprintf('Prandtl Number (Pr): %.3f\n', Pr);
 fprintf('Volume Expansion Coefficient (β): %.7f K⁻¹\n', beta);
 fprintf('Speed of Sound (c): %.1f m/s\n', c);
 fprintf('Surface Tension (σ): %.5f N/m\n', sigma);
+
+%% Working out h_i
+
+% Calculate the convective heat transfer coefficient inside the tube (h_i)
+
+% Given parameters
+D = 16.4e-3;        % Diameter of the tube (m)
+m_dot = 0.05;       % Mass flow rate (kg/s)
+T_water = 24;       % Water temperature (°C), assumed as T_in
+
+% Water properties at 24°C (interpolated between 20°C and 25°C from a typical table)
+% Using approximate values for water (since the code uses air properties, we define water properties here)
+mu = 9.1244e-4;     % Dynamic viscosity of water at 24°C (kg/m·s)
+Pr = 6.3800;        % Prandtl number of water at 24°C
+k = 0.5951;         % Thermal conductivity of water at 24°C (W/m·K)
+
+% Calculate velocity (V)
+A = (pi * D^2) / 4; % Cross-sectional area of the tube (m^2)
+V = m_dot / (A * 997.32); % Velocity (m/s), using water density at 24°C (997.32 kg/m^3)
+
+% Calculate Reynolds number (Re)
+Re = (997.32 * V * D) / mu;
+fprintf('Reynolds Number (Re) = %.2f\n', Re);
+
+% Calculate Nusselt number (Nu) using Dittus-Boelter correlation: Nu = 0.023 * Re^0.8 * Pr^0.3
+Nu = 0.023 * Re^0.8 * Pr^0.3;
+fprintf('Nusselt Number (Nu) = %.2f\n', Nu);
+
+% Calculate convective heat transfer coefficient (h_i)
+h_i = (Nu * k) / D;
+fprintf('Convective Heat Transfer Coefficient (h_i) = %.6f W/m^2·K\n', h_i);
