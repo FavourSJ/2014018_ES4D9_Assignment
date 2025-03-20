@@ -1,3 +1,61 @@
+%% Question 3 function
+function t_220 = calculate_time_to_220_degrees()
+    % Function to calculate the time for the gas temperature to reach 220°C
+    % using the lumped capacitance method with a linearly increasing surrounding temperature
+    
+    % Given parameters
+    r = (0.25e-3) / (2 * 3);        % Radius of the spherical sensor (m)
+    h = 60;                         % Convective heat transfer coefficient (W/m^2·K)
+    k = 70;                         % Thermal conductivity of the gas (W/m·K)
+    rho_cp = 21452;                 % Volumetric heat capacity (J/m^3·K)
+    beta = 200;                     % Rate of temperature increase (°C/s)
+    T_ini = 20;                     % Initial surrounding temperature (°C)
+    T_target = 220;                 % Target temperature (°C)
+    
+    % Step 1: Calculate characteristic length (l_c = r for this problem)
+    l_c = r;  % Characteristic length (m)
+    fprintf('Characteristic Length (l_c) = %.2e m\n', l_c);
+    
+    % Step 2: Calculate Biot number (Bi)
+    Bi = (h * l_c) / k;
+    fprintf('Biot Number (Bi) = %.2e\n', Bi);
+    
+    % Check if lumped capacitance is valid (Bi < 0.1)
+    if Bi >= 0.1
+        error('Biot number (Bi = %.2e) is not less than 0.1. Lumped capacitance method is not valid.', Bi);
+    end
+    
+    % Step 3: Calculate lumped capacitance time constant (tau_lumped)
+    V = (4/3) * pi * r^3;          % Volume of the sphere (m^3)
+    A = 4 * pi * r^2;              % Surface area of the sphere (m^2)
+    tau_lumped = (rho_cp * V) / (h * A);
+    fprintf('Lumped Capacitance Time Constant (tau_lumped) = %.3f s\n', tau_lumped);
+    
+    % Step 4: Define the temperature equation and solve for t
+    % T(t) = beta * tau_lumped * (exp(-t/tau_lumped) - 1) + T_ini + beta * t
+    f = @(t) beta * tau_lumped * (exp(-t/tau_lumped) - 1) + T_ini + beta * t - T_target;
+    
+    % Use fzero to solve for t when T = 220°C
+    t_initial_guess = 1;  % Initial guess for t (s)
+    t_220 = fzero(f, t_initial_guess);
+    
+    % Display the result
+    fprintf('Time to reach 220°C: t_220 = %.3f s\n', t_220);
+    fprintf('Rounded to 1 decimal place: t_220 = %.1f s\n', round(t_220, 1));
+end
+
+%% Solve for the time when the gas temperature reaches 320°C
+
+% Define the equation: t^2 - 2.96*t - 44.14 = 5.56*exp(-t)
+f = @(t) t^2 - 2.96*t - 44.14 - 5.56*exp(-t);
+
+% Use fzero to solve for t
+t_initial_guess = 8;  % Initial guess for t (s), close to the expected solution
+t_320 = fzero(f, t_initial_guess);
+
+% Display the result
+fprintf('Time to reach 320°C: t_320 = %.4f s\n', t_320);
+
 %% Interpolating
 
 % Define the known data points from Table A-9
